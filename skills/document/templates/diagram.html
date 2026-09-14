@@ -101,8 +101,11 @@
       const bb=tx.getBBox();const r=document.createElementNS(NS,'rect');r.setAttribute('class','lbl');r.setAttribute('x',bb.x-5);r.setAttribute('y',bb.y-2);r.setAttribute('width',bb.width+10);r.setAttribute('height',bb.height+4);r.setAttribute('rx',3);svg.insertBefore(r,tx);}
   };
 })();
-// ===== arrows go here, e.g.:
+// ===== arrows go here, inside the fonts.ready callback — boxes are measured after Inter has loaded,
+// otherwise the arrows are computed against fallback-font layout and land off by a few pixels.
+document.fonts.ready.then(() => {
 // connect('#user','#web',{label:'opens /orders'});
+});
 </script>
 </body>
 </html>

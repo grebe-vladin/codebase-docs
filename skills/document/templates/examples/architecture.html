@@ -115,7 +115,9 @@
       const bb=tx.getBBox();const r=document.createElementNS(NS,'rect');r.setAttribute('class','lbl');r.setAttribute('x',bb.x-5);r.setAttribute('y',bb.y-2);r.setAttribute('width',bb.width+10);r.setAttribute('height',bb.height+4);r.setAttribute('rx',3);svg.insertBefore(r,tx);}
   };
 })();
-// ===== arrows go here, e.g.:
+// ===== arrows go here, inside the fonts.ready callback — boxes are measured after Inter has loaded,
+// otherwise the arrows are computed against fallback-font layout and land off by a few pixels.
+document.fonts.ready.then(() => {
 connect('#user','#web',{label:'uses'});
 connect('#web','#ctrl',{label:'HTTPS / JSON',dy:-14});
 connect('#ctrl','#svc');
@@ -124,6 +126,7 @@ connect('#svc','#pg',{label:'reads / writes',from:'right',to:'left',offset:18,at
 connect('#redis','#worker',{label:'job',from:'left',to:'right',offset:0,cls:'alt',at:0.2,labelAt:0.93,dy:-13});
 connect('#worker','#payment',{label:'charge',from:'right',to:'left',offset:-22,at:0.78,labelAt:0.1,dy:-13});
 connect('#worker','#pg',{label:'writes job',from:'right',to:'left',offset:22,cls:'soft',labelAt:0.3,dy:13});
+});
 </script>
 </body>
 </html>

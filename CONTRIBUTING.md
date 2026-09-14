@@ -25,3 +25,9 @@ Look at `/tmp/pages/page-*.png` after a change to the templates or the build scr
 ## Reporting issues
 
 Include the doctor output, the OS, and the part of the output that looked wrong (a page PNG or a diagram). Never paste real client data or funding identifiers.
+
+## Known pitfalls (learned the hard way)
+
+- `marked`'s CLI truncates piped stdout at 64 KB — always call it with `-i`/`-o` files (build-pdf.mjs does).
+- Diagram arrows must be drawn after `document.fonts.ready`; before that the boxes are laid out in the fallback font and every arrow lands a few pixels off.
+- Chrome print cannot number a table of contents; build-pdf.mjs prints once, reads the page text back with `pdftotext`, and prints again with the numbers.

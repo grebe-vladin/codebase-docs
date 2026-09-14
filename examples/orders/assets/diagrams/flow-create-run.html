@@ -111,8 +111,10 @@
       const bb=tx.getBBox();const r=document.createElementNS(NS,'rect');r.setAttribute('class','lbl');r.setAttribute('x',bb.x-5);r.setAttribute('y',bb.y-2);r.setAttribute('width',bb.width+10);r.setAttribute('height',bb.height+4);r.setAttribute('rx',3);svg.insertBefore(r,tx);}
   };
 })();
-// ===== arrows go here, e.g.:
+// ===== arrows go here, inside the fonts.ready callback — boxes are measured after Inter has loaded.
+document.fonts.ready.then(() => {
 connect('#s1','#s2');connect('#s2','#s3',{label:'POST /orders',labelAt:0.5,dx:40});connect('#s3','#s4',{label:'job',cls:'alt',from:'bottom',to:'top',dx:22});connect('#s4','#s5');connect('#s5','#s6',{from:'right',to:'bottom'});connect('#s6','#s7',{label:'200 JSON',dx:44});connect('#s7','#s8');
+});
 </script>
 </body>
 </html>

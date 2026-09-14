@@ -94,3 +94,10 @@ body.compact ol, body.compact ul { margin-bottom: 4pt; }
   .funding-bar { position: static; margin: 0 -12mm; padding: 3mm 12mm; }
   body.compact .cover { min-height: 0; }
 }
+/* table of contents rows: title, dotted leader, page number */
+.toc a { display: flex; align-items: baseline; gap: 4pt; }
+.toc a .t { flex: 0 1 auto; }
+.toc a .pg { flex: 0 0 auto; font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+.toc a .pg::before { content: ""; display: inline-block; }
+.toc a:has(.pg)::after { content: ""; order: 1; flex: 1 1 auto; border-bottom: 1px dotted var(--line); margin: 0 2pt; transform: translateY(-3pt); }
+.toc a .pg { order: 2; }

@@ -6,6 +6,7 @@
 // Expects the stamp comment at the top of the md:  <!-- codebase-docs {"module":..,"title":..,"company":..,"generated":..,"repos":{..}} -->
 import fs from "node:fs";
 import path from "node:path";
+import os from "node:os";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
@@ -23,7 +24,11 @@ const stamp = stampM ? JSON.parse(stampM[1]) : {};
 const body = src.replace(/<!--\s*codebase-docs[\s\S]*?-->/, "");
 
 // markdown -> html via marked CLI (npx, cached after first run)
-let html = execFileSync("npx", ["-y", "marked@18", "--gfm"], { input: body, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+// marked's CLI truncates piped stdout at 64 KB (stdout is not flushed before exit) — go through files instead.
+const tmpIn = path.join(os.tmpdir(), `codebase-docs-${process.pid}.md`), tmpOut = tmpIn.replace(/\.md$/, ".html");
+fs.writeFileSync(tmpIn, body);
+execFileSync("npx", ["-y", "marked@18", "--gfm", "-i", tmpIn, "-o", tmpOut], { stdio: "ignore" });
+let html = fs.readFileSync(tmpOut, "utf8"); fs.unlinkSync(tmpIn); fs.unlinkSync(tmpOut);
 
 // heading ids + TOC (h2/h3)
 const slug = (s) => s.toLowerCase().replace(/<[^>]+>/g, "").replace(/&[a-z]+;/g, "").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -33,9 +38,11 @@ html = html.replace(/<h([1-3])>([\s\S]*?)<\/h\1>/g, (m, l, t) => {
   if (l !== "1") toc.push({ l: +l, id, t: t.replace(/<[^>]+>/g, "") });
   return `<h${l} id="${id}">${t}</h${l}>`;
 });
-let tocHtml = ""; let open = 0;
-for (const e of toc) { if (e.l === 2) tocHtml += `${open ? "</ul></li>" : ""}<li><a href="#${e.id}">${e.t}</a><ul>`, open = 1; else if (open) tocHtml += `<li><a href="#${e.id}">${e.t}</a></li>`; }
-tocHtml += open ? "</ul></li>" : "";
+const renderToc = (pages = {}) => { let t = ""; let open = 0;
+  const row = (e) => `<a href="#${e.id}"><span class="t">${e.t}</span>${pages[e.id] ? `<span class="pg">${pages[e.id]}</span>` : ""}</a>`;
+  for (const e of toc) { if (e.l === 2) t += `${open ? "</ul></li>" : ""}<li>${row(e)}<ul>`, open = 1; else if (open) t += `<li>${row(e)}</li>`; }
+  return t + (open ? "</ul></li>" : ""); };
+let tocHtml = renderToc();
 // figures: <p><img></p> -> figure with caption
 html = html.replace(/<p><img src="([^"]+)" alt="([^"]*)"\s*\/?><\/p>/g, (m, s, a) => `<figure><img src="${s}" alt="${a}">${a ? `<figcaption>${a}</figcaption>` : ""}</figure>`);
 // tables scroll-safe wrapper
@@ -92,6 +99,24 @@ if (!args.includes("--no-pdf")) {
   const pdfPath = path.join(dir, base + ".pdf");
   execFileSync(chrome, ["--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check", "--no-pdf-header-footer", "--force-color-profile=srgb",
     "--virtual-time-budget=6000", `--print-to-pdf=${pdfPath}`, `file://${htmlPath}`], { stdio: "ignore" });
+  // Table of contents with page numbers: Chrome cannot do target-counter(), so read the printed pages back.
+  if (!compact && toc.length && !args.includes("--no-toc-pages")) {
+    let pdftotext = true; try { execFileSync("pdftotext", ["-v"], { stdio: "ignore" }); } catch { pdftotext = false; }
+    if (!pdftotext) console.log("toc:  page numbers skipped — pdftotext (poppler) not installed");
+    else {
+      const norm = (x) => x.replace(/\s+/g, " ").replace(/[\u00ad]/g, "").trim().toLowerCase();
+      const measure = () => { const n = +(execFileSync("pdfinfo", [pdfPath], { encoding: "utf8" }).match(/Pages:\s+(\d+)/) || [])[1] || 0; const pages = {}; let cursor = 3;
+        const texts = []; for (let i = 1; i <= n; i++) texts[i] = norm(execFileSync("pdftotext", ["-f", String(i), "-l", String(i), "-layout", pdfPath, "-"], { encoding: "utf8" }));
+        for (const e of toc) { const key = norm(e.t).slice(0, 60); let found = 0; for (let i = cursor; i <= n; i++) if (texts[i].includes(key)) { found = i; break; } if (!found) for (let i = 3; i <= n; i++) if (texts[i].includes(key)) { found = i; break; } if (found) { pages[e.id] = found; cursor = found; } }
+        return pages; };
+      let pages = measure(); let out2 = out.replace(tocHtml, renderToc(pages)); fs.writeFileSync(htmlPath, out2);
+      execFileSync(chrome, ["--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check", "--no-pdf-header-footer", "--force-color-profile=srgb", "--virtual-time-budget=6000", `--print-to-pdf=${pdfPath}`, `file://${htmlPath}`], { stdio: "ignore" });
+      const again = measure(); const moved = toc.filter(e => pages[e.id] !== again[e.id]).length;
+      if (moved) { out2 = out.replace(tocHtml, renderToc(again)); fs.writeFileSync(htmlPath, out2); execFileSync(chrome, ["--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check", "--no-pdf-header-footer", "--force-color-profile=srgb", "--virtual-time-budget=6000", `--print-to-pdf=${pdfPath}`, `file://${htmlPath}`], { stdio: "ignore" }); pages = again; }
+      const missing = toc.filter(e => !pages[e.id]).length;
+      console.log(`toc:  page numbers for ${toc.length - missing}/${toc.length} entries${missing ? " (some headings not found in the text layer)" : ""}`);
+    }
+  }
   console.log(`pdf:  ${pdfPath}`);
   if (args.includes("--history")) {
     const shas = Object.values(stamp.repos || {}).map(v => (v.sha || v).slice(0, 7)).join("-") || "nosha";

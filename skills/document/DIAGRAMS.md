@@ -26,7 +26,8 @@ Every diagram is a hand-authored HTML page in `assets/diagrams/<name>.html`, ren
 ## Checklist — by looking at the PNG, every time
 
 - No box overlaps another; no label sits on a line or on a box edge; no text is clipped or wraps mid-word.
-- Arrows start and end on box edges; solid arrows cross nothing; a dashed async arrow may cross at most two solid lines, never text.
+- Arrows start and end on box edges; no arrow of any style crosses a box; a dashed async arrow may cross at most two solid lines, never text.
+- An arrow into a `.step` never enters through the left edge, where the number badge sits — use `to:'top'`, `to:'bottom'` or `to:'right'`.
 - Text ≥ 14 px at 1× (28 px in the PNG) except `.kind` labels; names ≥ 17 px.
 - Colours match the legend; the legend is present when more than one node kind is used.
 - Names, step numbers and endpoint paths match the document word for word.
