@@ -1,0 +1,23 @@
+{
+  "name": "Acme Test",
+  "slug": "acme-test",
+  "logo": "logo.png",
+  "banners": [],
+  "fundingText": "",
+  "footerText": "",
+  "colors": {
+    "primary": "#1a56db",
+    "accent": "#f59e0b",
+    "ink": "#1a1a1a",
+    "muted": "#6b7280",
+    "paper": "#ffffff",
+    "surface": "#f4f6f8",
+    "line": "#d5dae1"
+  },
+  "font": {
+    "heading": "Inter",
+    "body": "Inter",
+    "mono": "JetBrains Mono"
+  },
+  "updatedAt": "2026-09-14T09:52:13.299Z"
+}

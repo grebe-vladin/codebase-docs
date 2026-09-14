@@ -1,0 +1,5 @@
+node_modules/
+.DS_Store
+*.log
+evals/results/
+evals/fixtures/*/.git/

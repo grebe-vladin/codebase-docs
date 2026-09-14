@@ -1,0 +1,40 @@
+# GitHub Actions: warn on a pull request when it touches code covered by a module document.
+# Copy to .github/workflows/docs-stale.yml in the repo that HOLDS the docs folder (docs must live in this repo,
+# with the covered repos as subfolders or as this repo itself). Adjust DOCS_DIR and ROOT_DIR.
+name: docs-stale
+on: { pull_request: {} }
+permissions: { contents: read, pull-requests: write }
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env: { DOCS_DIR: docs, ROOT_DIR: . }
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Files changed in this PR
+        run: git diff --name-only origin/${{ github.base_ref }}...HEAD > changed.txt
+      - name: Match against documented modules
+        id: match
+        run: |
+          node - <<'JS' > report.md
+          const fs=require("fs"),path=require("path");const docs=process.env.DOCS_DIR,root=process.env.ROOT_DIR;const changed=fs.readFileSync("changed.txt","utf8").split("\n").filter(Boolean);
+          const glob=(p)=>new RegExp("^"+p.replace(/[.+^${}()|[\]\\]/g,"\\$&").replace(/\*\*\//g,"(?:.*/)?").replace(/\*\*/g,".*").replace(/\*/g,"[^/]*")+"$");
+          const hits=[];for(const d of fs.readdirSync(docs,{withFileTypes:true})){if(!d.isDirectory())continue;for(const f of fs.readdirSync(path.join(docs,d.name))){if(!f.endsWith(".md"))continue;const m=fs.readFileSync(path.join(docs,d.name,f),"utf8").match(/<!--\s*codebase-docs\s+(\{[\s\S]*?\})\s*-->/);if(!m)continue;let st;try{st=JSON.parse(m[1])}catch{continue}
+          for(const [repo,v] of Object.entries(st.repos||{})){const base=repo==="."?"":repo.replace(/\/$/,"")+"/";const files=changed.filter(c=>c.startsWith(base)&&(v.paths||[]).some(p=>glob(p).test(c.slice(base.length))));if(files.length)hits.push({module:st.module||d.name,repo,files,doc:path.join(docs,d.name,f)});}}}
+          if(!hits.length){console.log("");process.exit(0)}
+          console.log("### 📄 Documentation may be out of date\n");for(const h of hits)console.log(`- **${h.module}** (\`${h.doc}\`) covers ${h.files.length} changed file(s) in \`${h.repo}\`: ${h.files.slice(0,5).map(f=>"`"+f+"`").join(", ")}${h.files.length>5?" …":""}`);
+          console.log("\nRun `/codebase-docs:document <module>` after merging, or now on this branch.");
+          JS
+          echo "found=$([ -s report.md ] && echo yes || echo no)" >> "$GITHUB_OUTPUT"
+      - name: Comment on the PR
+        if: steps.match.outputs.found == 'yes'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = require("fs").readFileSync("report.md", "utf8");
+            const { data: comments } = await github.rest.issues.listComments({ ...context.repo, issue_number: context.issue.number });
+            const mine = comments.find(c => c.body.startsWith("### 📄 Documentation may be out of date"));
+            if (mine) await github.rest.issues.updateComment({ ...context.repo, comment_id: mine.id, body });
+            else await github.rest.issues.createComment({ ...context.repo, issue_number: context.issue.number, body });

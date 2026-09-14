@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>DIAGRAM TITLE</title>
+<!-- brand.css is exported by scripts/brand.mjs into assets/brand/ -->
+<link rel="stylesheet" href="../brand/brand.css">
+<style>
+  /* ---------- diagram primitives (do not restyle per diagram; compose them) ---------- */
+  html,body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-body);-webkit-font-smoothing:antialiased}
+  .canvas{position:relative;width:var(--w);height:var(--h);padding:40px 48px;box-sizing:border-box;overflow:hidden}
+  .title{font-family:var(--font-heading);font-weight:700;font-size:26px;color:var(--primary-deep);margin:0 0 4px}
+  .subtitle{font-size:15px;color:var(--muted);margin:0 0 24px}
+  .brandmark{position:absolute;right:48px;bottom:28px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+  .brandmark img{height:28px;width:auto}
+  /* nodes */
+  .node{position:relative;background:var(--paper);border:2px solid var(--primary);border-radius:10px;padding:12px 16px;box-sizing:border-box;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+  .node .kind{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+  .node .name{display:block;font-family:var(--font-heading);font-weight:600;font-size:18px;line-height:1.25}
+  .node ul{margin:8px 0 0;padding-left:16px;font-size:14.5px;color:var(--ink);line-height:1.35}
+  .node--fe{border-color:var(--fe)} .node--fe .kind{color:var(--fe)}
+  .node--be{border-color:var(--be)} .node--be .kind{color:var(--be)}
+  .node--db{border-color:var(--db);border-radius:14px 14px 20px 20px/10px 10px 22px 22px} .node--db .kind{color:var(--db)}
+  .node--ext{border-style:dashed;border-color:var(--ext)} .node--ext .kind{color:var(--ext)}
+  .node--user{border-radius:999px;text-align:center;border-color:var(--user)} .node--user .kind{color:var(--user)}
+  .node--emph{background:var(--primary-soft)}
+  /* groups (a repo, a boundary) */
+  .group{position:relative;border:1.5px dashed var(--line);border-radius:14px;padding:34px 16px 16px;box-sizing:border-box;background:var(--surface)}
+  .group>.label{position:absolute;top:10px;left:16px;font-family:var(--font-heading);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  /* swimlanes */
+  .lanes{display:grid;grid-template-columns:150px 1fr;border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+  .lane-label{display:flex;align-items:center;padding:0 14px;background:var(--surface);border-bottom:1.5px solid var(--line);font-family:var(--font-heading);font-weight:600;font-size:15px;color:var(--primary-deep)}
+  .lane{position:relative;border-bottom:1.5px solid var(--line);display:grid;align-items:center;padding:14px 12px;box-sizing:border-box}
+  .lanes>:nth-last-child(-n+2){border-bottom:0}
+  .step{position:relative;background:var(--paper);border:1.5px solid var(--primary);border-radius:8px;padding:11px 12px 11px 38px;font-size:15px;line-height:1.3;box-sizing:border-box;min-height:44px}
+  .step::before{content:attr(data-n);position:absolute;left:9px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:var(--primary);color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center}
+  .step--alt{border-color:var(--accent)} .step--alt::before{background:var(--accent)}
+  .step--end{border-style:dashed}
+  /* entity cards (data model) */
+  .entity{background:var(--paper);border:2px solid var(--primary);border-radius:8px;overflow:hidden;font-size:14px}
+  .entity header{background:var(--primary);color:#fff;font-family:var(--font-heading);font-weight:600;padding:6px 12px;font-size:14px}
+  .entity table{border-collapse:collapse;width:100%} .entity td{padding:3px 12px;border-top:1px solid var(--line);font-family:var(--font-mono);font-size:13px}
+  .entity td.k{color:var(--accent);font-weight:600;width:20px}
+  /* state pills */
+  .state{display:inline-block;background:var(--paper);border:2px solid var(--primary);border-radius:999px;padding:8px 18px;font-weight:600;font-size:14px}
+  .state--initial{background:var(--primary-soft)} .state--final{border-color:var(--muted);color:var(--muted)}
+  /* misc */
+  .note{font-size:14px;color:var(--muted);background:var(--accent-soft);border-left:3px solid var(--accent);padding:8px 10px;border-radius:0 6px 6px 0;line-height:1.35}
+  .legend{position:absolute;left:48px;bottom:28px;display:flex;gap:16px;font-size:13px;color:var(--muted)}
+  .legend i{display:inline-block;width:12px;height:12px;border:2px solid;border-radius:3px;vertical-align:-2px;margin-right:5px}
+  /* arrows overlay */
+  svg.arrows{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+  svg.arrows path{fill:none;stroke:var(--ink);stroke-width:2}
+  svg.arrows path.alt{stroke:var(--accent);stroke-dasharray:6 5}
+  svg.arrows path.soft{stroke:var(--muted)}
+  svg.arrows text{font-size:14px;fill:var(--ink);font-family:var(--font-body)}
+  svg.arrows rect.lbl{fill:var(--paper);stroke:none}
+  svg.arrows text.alt{fill:var(--accent)}
+</style>
+</head>
+<!-- Canvas size: keep aspect <= 2:1 so it fits a page width. Common: 1600x900, 1600x1000, 1400x800 -->
+<body data-width="1400" data-height="800">
+<div class="canvas" style="--w:1400px;--h:800px">
+  <h1 class="title">Flow 1 — Create and fulfil an order</h1>
+  <p class="subtitle">From the operator clicking “Save & send” to the result showing up in the list</p>
+
+<div class="lanes" style="margin-top:6px">
+  <div class="lane-label">Operator</div>
+  <div class="lane" style="grid-template-columns:repeat(6,1fr);gap:24px;height:110px"><div class="step" data-n="1" id="s1">Fills the order form, clicks <b>&nbsp;Save & send</b></div><div></div><div></div><div></div><div></div><div class="step step--end" data-n="8" id="s8">Sees status <b>&nbsp;done</b> + output</div></div>
+  <div class="lane-label">Web app</div>
+  <div class="lane" style="grid-template-columns:repeat(6,1fr);gap:24px;height:110px"><div></div><div class="step" data-n="2" id="s2">Validates form (zod), POST /orders</div><div></div><div></div><div class="step" data-n="7" id="s7">Polls GET /orders/:id every 3 s</div><div></div></div>
+  <div class="lane-label">API</div>
+  <div class="lane" style="grid-template-columns:repeat(6,1fr);gap:24px;height:110px"><div></div><div></div><div class="step" data-n="3" id="s3">OrdersService.create() saves order, enqueues job</div><div></div><div class="step" data-n="6" id="s6">Returns order with latest job</div><div></div></div>
+  <div class="lane-label">Worker</div>
+  <div class="lane" style="grid-template-columns:repeat(6,1fr);gap:24px;height:110px"><div></div><div></div><div></div><div class="step step--alt" data-n="4" id="s4">OrderFulfilmentProcessor calls payment API, stores result</div><div></div><div></div></div>
+  <div class="lane-label">Database</div>
+  <div class="lane" style="grid-template-columns:repeat(6,1fr);gap:24px;height:110px"><div></div><div></div><div></div><div class="step" data-n="5" id="s5">order_jobs.status = done</div><div></div><div></div></div>
+</div>
+<p class="note" style="margin-top:18px;width:520px">Failure path: if the payment API errors 3 times, the job is marked <b>failed</b> and the list shows a retry button (see §4.1).</p>
+
+  <svg class="arrows"><defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--ink)"/></marker>
+    <marker id="arrow-alt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--accent)"/></marker>
+    <marker id="arrow-soft" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--muted)"/></marker>
+  </defs></svg>
+  <div class="brandmark"><!-- <img src="../brand/logo.png" alt=""> --><span>{{brand_name}}</span></div>
+</div>
+<script>
+// connect('#from', '#to', {label:'POST /orders', from:'right', to:'left', cls:'alt'|'soft', offset:0, at:0.5, labelAt:0.5, dx:0, dy:0})
+// Draws an orthogonal arrow between the edges of two elements. Sides: left|right|top|bottom (auto if omitted).
+// offset shifts the start/end point along the edge (px) so parallel arrows don't overlap; at (0..1) sets where the middle
+// segment sits between the two boxes — give each arrow sharing a corridor its own value (0.25, 0.5, 0.75); labelAt is 0..1 along the path;
+// the label gets a paper-coloured backing so it never sits on a line. Labels default to the path midpoint — use labelAt/dx/dy to move them onto a straight segment.
+(function(){
+  const svg=document.querySelector('svg.arrows'); const canvas=document.querySelector('.canvas'); const c0=canvas.getBoundingClientRect();
+  const box=el=>{const r=document.querySelector(el).getBoundingClientRect();return{x:r.left-c0.left,y:r.top-c0.top,w:r.width,h:r.height,cx:r.left-c0.left+r.width/2,cy:r.top-c0.top+r.height/2}};
+  const pt=(b,side,off)=>side==='left'?[b.x,b.cy+off]:side==='right'?[b.x+b.w,b.cy+off]:side==='top'?[b.cx+off,b.y]:[b.cx+off,b.y+b.h];
+  const auto=(a,b)=>{const dx=b.cx-a.cx,dy=b.cy-a.cy;return Math.abs(dx)>=Math.abs(dy)?(dx>0?['right','left']:['left','right']):(dy>0?['bottom','top']:['top','bottom'])};
+  window.connect=function(from,to,o={}){
+    const a=box(from),b=box(to);const[sa,sb]=auto(a,b);const fs=o.from||sa,ts=o.to||sb;const off=o.offset||0;
+    const[x1,y1]=pt(a,fs,off),[x2,y2]=pt(b,ts,off);let d;
+    const horiz=fs==='left'||fs==='right';
+    const at=o.at??0.5;
+    if(horiz&&(ts==='left'||ts==='right')){const mx=x1+(x2-x1)*at;d=`M${x1},${y1} H${mx} V${y2} H${x2}`;}
+    else if(!horiz&&(ts==='top'||ts==='bottom')){const my=y1+(y2-y1)*at;d=`M${x1},${y1} V${my} H${x2} V${y2}`;}
+    else if(horiz){d=`M${x1},${y1} H${x2} V${y2}`;} else {d=`M${x1},${y1} V${y2} H${x2}`;}
+    const NS='http://www.w3.org/2000/svg';const p=document.createElementNS(NS,'path');p.setAttribute('d',d);
+    p.setAttribute('marker-end',o.cls==='alt'?'url(#arrow-alt)':o.cls==='soft'?'url(#arrow-soft)':'url(#arrow)');if(o.cls)p.setAttribute('class',o.cls);svg.appendChild(p);
+    if(o.label){const t=o.labelAt??0.5;const L=p.getTotalLength();const m=p.getPointAtLength(L*t);
+      const tx=document.createElementNS(NS,'text');tx.setAttribute('x',m.x+(o.dx||0));tx.setAttribute('y',m.y+(o.dy||0)+4);tx.setAttribute('text-anchor','middle');if(o.cls)tx.setAttribute('class',o.cls);tx.textContent=o.label;svg.appendChild(tx);
+      const bb=tx.getBBox();const r=document.createElementNS(NS,'rect');r.setAttribute('class','lbl');r.setAttribute('x',bb.x-5);r.setAttribute('y',bb.y-2);r.setAttribute('width',bb.width+10);r.setAttribute('height',bb.height+4);r.setAttribute('rx',3);svg.insertBefore(r,tx);}
+  };
+})();
+// ===== arrows go here, e.g.:
+connect('#s1','#s2');connect('#s2','#s3',{label:'POST /orders',labelAt:0.5,dx:40});connect('#s3','#s4',{label:'job',cls:'alt',from:'bottom',to:'top',dx:22});connect('#s4','#s5');connect('#s5','#s6',{from:'right',to:'bottom'});connect('#s6','#s7',{label:'200 JSON',dx:44});connect('#s7','#s8');
+</script>
+</body>
+</html>

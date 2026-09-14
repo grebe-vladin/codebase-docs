@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="{{lang}}">
+<head>
+<meta charset="utf-8">
+<title>{{title}}</title>
+<style>{{brand_css}}</style>
+<style>{{doc_css}}</style>
+<style>:root{--footer-text:"{{footer_text}}"}</style>
+</head>
+<body class="{{body_class}}">
+{{funding_bars}}
+<section class="cover">
+  <div class="cover-brand">{{logo}}</div>
+  <div class="cover-main">
+    <div class="cover-kicker">{{kicker}}</div>
+    <h1 class="cover-title">{{title}}</h1>
+    <p class="cover-subtitle">{{subtitle}}</p>
+  </div>
+  {{meta}}
+  {{banners}}
+  <div class="cover-foot"><span>{{brand_name}}</span><span>{{generated}}</span></div>
+</section>
+<nav class="toc">
+  <h2>{{toc_label}}</h2>
+  <ul>{{toc}}</ul>
+</nav>
+<main class="doc">
+{{body}}
+</main>
+</body>
+</html>

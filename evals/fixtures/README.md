@@ -1,0 +1,1 @@
+Two minimal repos (`api` = NestJS, `web` = Next.js) with an `orders` module, used by the eval cases. Each is its own git repository (nested `.git`, committed as plain folders here — run `bash evals/fixtures/init.sh` after cloning to recreate them) so stamps and stale checks work.

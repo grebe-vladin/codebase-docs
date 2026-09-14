@@ -1,0 +1,13 @@
+{
+  "name": "codebase-docs",
+  "owner": { "name": "Vladin Grebenita", "url": "https://github.com/grebe-vladin" },
+  "metadata": { "description": "Module documentation generator for multi-repo codebases", "version": "0.1.0" },
+  "plugins": [
+    {
+      "name": "codebase-docs",
+      "source": "./",
+      "description": "Document a module across several repos as handover-grade Markdown + PDF with branded diagrams and screenshots.",
+      "category": "documentation"
+    }
+  ]
+}

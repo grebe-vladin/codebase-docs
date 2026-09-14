@@ -1,0 +1,46 @@
+{
+  "_note": "Verify every text against the programme's visual identity manual before first use. Fields: banners (files in this folder, display order), text (mandatory sentence), requires (identifiers the wizard must collect), placement (header | footer | both | cover).",
+  "pnrr": {
+    "name": "PNRR — Planul Național de Redresare și Reziliență (NextGenerationEU)",
+    "banners": [],
+    "text": "Finanțat de Uniunea Europeană – NextGenerationEU",
+    "requires": [
+      "projectTitle",
+      "contractNumber",
+      "beneficiary"
+    ],
+    "placement": "footer"
+  },
+  "pocidif": {
+    "name": "POCIDIF — Programul Operațional Creștere Inteligentă, Digitalizare și Instrumente Financiare 2021–2027 (FEDR)",
+    "banners": [],
+    "text": "Proiect cofinanțat din Fondul European de Dezvoltare Regională prin Programul Creștere Inteligentă, Digitalizare și Instrumente Financiare 2021-2027",
+    "requires": [
+      "smisCode",
+      "projectTitle",
+      "beneficiary"
+    ],
+    "placement": "footer"
+  },
+  "poc-2014-2020": {
+    "name": "POC — Programul Operațional Competitivitate 2014–2020 (FEDR)",
+    "banners": [],
+    "text": "Proiect cofinanțat din Fondul European de Dezvoltare Regională prin Programul Operațional Competitivitate 2014-2020",
+    "requires": [
+      "smisCode",
+      "projectTitle",
+      "beneficiary"
+    ],
+    "placement": "footer"
+  },
+  "other": {
+    "name": "Other programme (EU, national, private grant)",
+    "banners": [],
+    "text": "",
+    "requires": [
+      "projectTitle",
+      "fundingText"
+    ],
+    "placement": "footer"
+  }
+}
