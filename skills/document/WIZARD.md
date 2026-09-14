@@ -28,14 +28,17 @@ Then: `node scripts/brand.mjs set --name "<Company>" --logo <path> --primary "#�
 
 ## Round D — funded project only
 
-Read `templates/funding/programs.json` (in this skill) first: it lists the programmes on file with their banners, mandatory sentence, required identifiers and default placement.
+`node scripts/funding-assets.mjs list` first: it prints every programme on file (`templates/funding/programs.json`), its confirmed banner set, its official sources and its rules.
 
-12. **Programme**: the entries of `programs.json` by name, plus "Other / not listed". Funding wording and logos differ per programme (POCIDIF ≠ PNRR ≠ POC), so this is never assumed.
-13. **Identifiers** the programme requires (`requires`): SMIS code, contract number, project title, beneficiary — one question, free text, all of them. Also the official sentence if the programme is "Other" or its `text` is empty.
-14. **Banners**: if `templates/funding/<programme>/` holds the files listed in `programs.json`, show them as the recommended set; otherwise ask for a folder or file paths (or a website to probe) — and copy what the user gives into `templates/funding/<programme>/` and add them to `programs.json` so the next run has them.
-15. **Placement**: footer on every page (Recommended, the programme's default) / header on every page / both / cover only.
+12. **Programme**: the entries of `programs.json` by name, plus "Other / not listed". Funding wording and logos differ per programme (PoCIDIF ≠ PNRR ≠ POC), so this is never assumed.
+13. **Identifiers** the programme requires (`requires`): SMIS code, contract number, project title, beneficiary — one question, free text, all of them. PoCIDIF also needs the funding mix: FEDR + state budget → "Cofinanțat de Uniunea Europeană", FEDR only → "Finanțat de Uniunea Europeană" (`textVariants`). "Other" programmes: the official sentence too.
+14. **Banners** — the official set, confirmed by a person:
+   - Programme has `banners` confirmed (`confirmedBy`, `confirmedAt` in `programs.json`): show the three images (Read them, name them: EU emblem with the statement, Guvernul României, programme logo) and ask "Use this official set (Recommended — verified against <manual> on <date>) / replace with my own files". Yes → done.
+   - No confirmed set: `node scripts/funding-assets.mjs fetch <programme>` downloads the official packs (ec.europa.eu, mfe.gov.ro, identitate.gov.ro; ZIPs are unzipped, `.ai`/`.pdf` logos rasterised and trimmed), then prints the recommended files. **Look at each one**, show the user which file plays which role, ask for confirmation, then `node scripts/funding-assets.mjs confirm <programme> <files…> --by "<user name>"` — the files are copied into `templates/funding/<programme>/` and recorded in `programs.json`.
+   - Download fails or "Other" programme: ask for a folder or file paths (or a website to probe) and confirm the same way. Never assemble a set from memory or from unofficial sources.
+15. **Placement**: the programme's default (`placement` in `programs.json`, from its manual) is the recommended option; header on every page / footer on every page / both / cover only.
 
-**Done when:** programme, every required identifier, at least one banner file on disk, the sentence, and the placement are all known. Anything missing or contradictory (a code that does not look like a SMIS code, a banner for another programme) → ask again and wait. A funded-project document is never produced with incomplete or guessed funding data.
+**Done when:** programme, every required identifier, a confirmed banner set on disk, the sentence, and the placement are all known. Anything missing or contradictory (a code that does not look like a SMIS code, a banner for another programme) → ask again and wait. A funded-project document is never produced with incomplete or guessed funding data.
 
 ## After the wizard
 
@@ -43,4 +46,4 @@ Read `templates/funding/programs.json` (in this skill) first: it lists the progr
 - Funded project: copy the programme's banners to `<docs>/<module>/assets/brand/funding/` and put the funding block in the stamp (`DOC-TEMPLATE.md`).
 - Write `<root>/.codebase-docs.json`: `{ "company": "<slug>", "language", "audience", "outputDir", "screenshotsUrl", "engine", "depth", "extras": ["onepager","docx"], "funding": { "program", "placement", "identifiers": {…}, "text", "banners": [ "funding/eu.png", … ] } | null, "updatedAt" }`.
 
-Brand store: `~/.codebase-docs/brands/<slug>/brand.json` + logo + `banners/`. Outside the plugin, so plugin updates never lose it. Funding assets live inside the plugin under `templates/funding/` (commit them with the plugin when they are the team's official set).
+Brand store: `~/.codebase-docs/brands/<slug>/brand.json` + logo + `banners/`. Outside the plugin, so plugin updates never lose it. Funding assets live inside the plugin under `templates/funding/<programme>/` (confirmed PNGs are committed; `downloads/` is not).

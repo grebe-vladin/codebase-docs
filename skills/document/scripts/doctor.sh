@@ -10,6 +10,7 @@ if command -v pdftoppm >/dev/null 2>&1; then ok "pdftoppm $(pdftoppm -v 2>&1 | h
 if command -v git >/dev/null 2>&1; then ok "git"; else bad "git — needed for stamps and stale checks"; fi
 if command -v npm >/dev/null 2>&1; then ok "npm (registry lookups, audit)"; else wrn "npm not found — dependency report will skip registry and audit"; fi
 if ls "$HOME/.npm/_npx" >/dev/null 2>&1 && grep -rqs '"name": "marked"' "$HOME/.npm/_npx" 2>/dev/null; then ok "marked cached for npx"; else wrn "marked not cached yet — first PDF build needs network (npx -y marked@18)"; fi
+command -v unzip >/dev/null 2>&1 && ok "unzip (funding asset packs)" || wrn "unzip not found — official funding logo packs cannot be extracted automatically"
 command -v pandoc >/dev/null 2>&1 && ok "pandoc (DOCX export)" || wrn "pandoc not found — DOCX export unavailable (brew install pandoc | apt-get install pandoc)"
 command -v composer >/dev/null 2>&1 && ok "composer (PHP dependency report)" || wrn "composer not found — PHP audit unavailable"
 command -v pip-audit >/dev/null 2>&1 && ok "pip-audit (Python dependency report)" || wrn "pip-audit not found — Python audit unavailable (pipx install pip-audit)"

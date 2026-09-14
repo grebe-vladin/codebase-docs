@@ -3,3 +3,4 @@ node_modules/
 *.log
 evals/results/
 evals/fixtures/*/.git/
+skills/document/templates/funding/*/downloads/

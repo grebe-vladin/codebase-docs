@@ -1,12 +1,17 @@
 # Funding references
 
-Drop here the official assets of each funding programme you document under: logos/banners (PNG or SVG, on white) and the wording the programme's visual-identity manual requires. One folder per programme, named by its key in `programs.json`:
+Official assets for funded-project documents, one folder per programme, keyed like `programs.json`:
 
 ```
 funding/
-  programs.json
-  pnrr/            eu-nextgenerationeu.png, guvern.png, pnrr.png …
-  poc-2014-2020/   eu.png, guvern.png, instrumente-structurale.png …
+  programs.json        sources (official URLs), rules, required identifiers, default placement, confirmed banners
+  pocidif/             eu.png, guvern.png, program.png      confirmed set (committed)
+  pnrr/                eu-ngeu.png, guvern.png, pnrr.png    confirmed set (committed)
+  <programme>/downloads/   raw packs, manuals, rasterised logos (git-ignored; recreated by `funding-assets.mjs fetch`)
 ```
 
-`programs.json` holds, per programme: the banner files in display order, the mandatory sentence(s), which identifiers are required (SMIS code, contract number, project title, beneficiary), and the default placement. The wizard reads it; when a programme, a banner or a required identifier is missing, the skill **asks and waits** — it never produces a funded-project document with incomplete or guessed funding data.
+- `node scripts/funding-assets.mjs list` — what is on file.
+- `node scripts/funding-assets.mjs fetch <programme>` — download the official packs, unzip, rasterise `.ai`/`.pdf` logos, trim, print the recommended files.
+- `node scripts/funding-assets.mjs confirm <programme> <file…> --by "<name>"` — copy the chosen files into the programme folder and record them; the wizard offers a confirmed set as the recommended option and still asks the user.
+
+Manuals change: the sources were verified on 2026-09-14. When a programme publishes a new manual, run `fetch --force`, read the manual in `downloads/`, and re-confirm.

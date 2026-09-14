@@ -1,29 +1,136 @@
 {
-  "_note": "Verify every text against the programme's visual identity manual before first use. Fields: banners (files in this folder, display order), text (mandatory sentence), requires (identifiers the wizard must collect), placement (header | footer | both | cover).",
+  "_note": "Sources are official pages verified 2026-09-14 (ec.europa.eu, mfe.gov.ro, identitate.gov.ro, fonduri-ue.gov.ro). `funding-assets.mjs fetch <key>` downloads them, unzips, rasterises .ai/.pdf logos, and prints the candidates matching `pick` (globs, in display order). Nothing becomes a banner until a person confirms (`funding-assets.mjs confirm`). Re-check the manual before first use: rules change.",
+  "_rules_common": "EU emblem: statement spelled out in full next to the emblem, never the acronym 'UE'; minimum height 1 cm (2 cm bilingual); at least as large (height or width) as the biggest other logo on the page; free space between logos not smaller than the emblem; the set on the front / first page of every deliverable; no contractor logos. Order for RO 2021-2027 programmes: EU → Guvernul României → programme logo.",
+  "pocidif": {
+    "name": "PoCIDIF — Programul Creștere Inteligentă, Digitalizare și Instrumente Financiare 2021–2027 (FEDR)",
+    "banners": [
+      "eu.png",
+      "guvern.png",
+      "program.png"
+    ],
+    "text": "Cofinanțat de Uniunea Europeană",
+    "textVariants": {
+      "fedr-plus-state-budget": "Cofinanțat de Uniunea Europeană",
+      "fedr-only": "Finanțat de Uniunea Europeană"
+    },
+    "requires": [
+      "smisCode",
+      "projectTitle",
+      "beneficiary"
+    ],
+    "placement": "footer",
+    "order": [
+      "eu",
+      "guvern",
+      "program"
+    ],
+    "rules": "MIV PoCIDIF 2026 §2.1–2.2: EU emblem with the full statement (Cofinanțat when FEDR + state budget, Finanțat when FEDR only), Guvernul României, PoCIDIF logo, in this order; EU emblem same size as the others; PoCIDIF logo min 25 mm / 95 px wide; web: set at the top, colour, plus the sentence 'Pentru informații detaliate despre celelalte programe cofinanțate de Uniunea Europeană, vă invităm să vizitați www.mfe.gov.ro'. Not required on internal documents; required on deliverables.",
+    "sources": [
+      {
+        "url": "https://ec.europa.eu/regional_policy/sources/information-sources/logo-download-center/co-funded_ro.zip",
+        "file": "eu-co-funded_ro.zip",
+        "note": "EU emblem + 'Cofinanțat de Uniunea Europeană' (PNG/JPG/EPS)",
+        "page": "https://ec.europa.eu/regional_policy/information-sources/logo-download-center_en"
+      },
+      {
+        "url": "https://ec.europa.eu/regional_policy/sources/information-sources/logo-download-center/funded_ro.zip",
+        "file": "eu-funded_ro.zip",
+        "note": "EU emblem + 'Finanțat de Uniunea Europeană' (FEDR-only projects)"
+      },
+      {
+        "url": "https://identitate.gov.ro/ro/wp-content/uploads/2017/03/sigla_gov_ro_coroana.zip",
+        "file": "guvern-sigla.zip",
+        "note": "Sigla Guvernului României (PNG/AI/PDF)",
+        "page": "https://identitate.gov.ro/ro/identitate-vizuala/"
+      },
+      {
+        "url": "https://mfe.gov.ro/wp-content/uploads/2026/06/157623cea546e1ce21694d542d9481f3.zip",
+        "file": "pocidif-sigle.zip",
+        "note": "Siglele PoCIDIF (PNG + EPS)",
+        "page": "https://mfe.gov.ro/pocidif/identitate-vizuala-program-pocidif/"
+      },
+      {
+        "url": "https://mfe.gov.ro/wp-content/uploads/2026/06/a6a417a3fb3cfdbd632baa8234a54ebb.zip",
+        "file": "pocidif-miv-2026.zip",
+        "note": "Manual de Identitate Vizuală PoCIDIF 2026 (PDF + DOCX) — read before first use"
+      },
+      {
+        "url": "https://mfe.gov.ro/wp-content/uploads/2023/11/36a75a7181268ad398aea38ba6c4c020.pdf",
+        "file": "ghid-identitate-vizuala-2021-2027.pdf",
+        "note": "Ghid de Identitate Vizuală 2021–2027 (Ordin 5744/2023) — rules for all FEDR/FSE+ programmes"
+      }
+    ],
+    "pick": [
+      "**/co-funded_RO/horizontal/RGB/PNG/*Co-fundedbytheEU_RGB_POS.png",
+      "**/sigla_guv_coroana_albastru.png",
+      "**/SIGLA PoCIDIF v2.png"
+    ],
+    "bannerSources": [
+      "downloads/eu-co-funded_ro/co-funded_RO/horizontal/RGB/PNG/RO_Co-fundedbytheEU_RGB_POS.png",
+      "downloads/guvern-sigla/sigla_guv_coroana_albastru.png",
+      "downloads/pocidif-sigle/SIGLA PoCIDIF v2.png"
+    ],
+    "confirmedAt": "2026-09-14",
+    "confirmedBy": "maintainer, checked against MIV PoCIDIF 2026 on 2026-09-14"
+  },
   "pnrr": {
     "name": "PNRR — Planul Național de Redresare și Reziliență (NextGenerationEU)",
-    "banners": [],
+    "banners": [
+      "eu-ngeu.png",
+      "guvern.png",
+      "pnrr.png"
+    ],
     "text": "Finanțat de Uniunea Europeană – NextGenerationEU",
     "requires": [
       "projectTitle",
       "contractNumber",
       "beneficiary"
     ],
-    "placement": "footer"
-  },
-  "pocidif": {
-    "name": "POCIDIF — Programul Operațional Creștere Inteligentă, Digitalizare și Instrumente Financiare 2021–2027 (FEDR)",
-    "banners": [],
-    "text": "Proiect cofinanțat din Fondul European de Dezvoltare Regională prin Programul Creștere Inteligentă, Digitalizare și Instrumente Financiare 2021-2027",
-    "requires": [
-      "smisCode",
-      "projectTitle",
-      "beneficiary"
+    "placement": "header",
+    "order": [
+      "eu-ngeu",
+      "guvern",
+      "pnrr"
     ],
-    "placement": "footer"
+    "rules": "MIV PNRR iunie 2024: on every PNRR material — EU logo with the text 'Finanțat de Uniunea Europeană NextGenerationEU' top-left, Guvernul României, PNRR logo top-right (last on the top row); bottom text 'PNRR. Finanțat de Uniunea Europeană – UrmătoareaGenerațieUE'; the programme page https://mfe.gov.ro/pnrr/ and https://www.facebook.com/PNRROficial/ on all materials; slogan 'PNRR: Fonduri pentru România modernă și reformată!'. EU emblem min 1 cm high, at least as large as the other logos.",
+    "sources": [
+      {
+        "url": "https://ec.europa.eu/regional_policy/sources/information-sources/logo-download-center/nextgenerationeu_ro.zip",
+        "file": "eu-nextgenerationeu_ro.zip",
+        "note": "EU emblem + 'Finanțat de Uniunea Europeană – NextGenerationEU' (EC pack, PNG/JPG/EPS) — the MIPE pack below carries the same lockup as .ai"
+      },
+      {
+        "url": "https://identitate.gov.ro/ro/wp-content/uploads/2017/03/sigla_gov_ro_coroana.zip",
+        "file": "guvern-sigla.zip",
+        "note": "Sigla Guvernului României (PNG/AI/PDF)"
+      },
+      {
+        "url": "https://mfe.gov.ro/wp-content/uploads/2024/07/8c51672dc800f447bc9c586c415f21a1.zip",
+        "file": "pnrr-pachet-logo.zip",
+        "note": "Pachet logo-uri PNRR — .ai only (PDF-compatible), rasterised automatically",
+        "page": "https://mfe.gov.ro/pnrr/"
+      },
+      {
+        "url": "https://mfe.gov.ro/wp-content/uploads/2024/07/2ef3a89f22d20cf696058b4891e94ac0.pdf",
+        "file": "pnrr-miv-2024-06.pdf",
+        "note": "Manual de Identitate Vizuală PNRR (iunie 2024) — read before first use"
+      }
+    ],
+    "pick": [
+      "**/individual/AI/logo UE_NextGEN_RGB.png",
+      "**/individual/AI/logo Guv. RO_RGB.png",
+      "**/individual/AI/logo PNRR_RGB.png"
+    ],
+    "bannerSources": [
+      "downloads/pnrr-pachet-logo/Pachet logo-uri PNRR/individual/AI/logo UE_NextGEN_RGB.png",
+      "downloads/pnrr-pachet-logo/Pachet logo-uri PNRR/individual/AI/logo Guv. RO_RGB.png",
+      "downloads/pnrr-pachet-logo/Pachet logo-uri PNRR/individual/AI/logo PNRR_RGB.png"
+    ],
+    "confirmedAt": "2026-09-14",
+    "confirmedBy": "maintainer, checked against MIV PNRR iunie 2024 on 2026-09-14"
   },
   "poc-2014-2020": {
-    "name": "POC — Programul Operațional Competitivitate 2014–2020 (FEDR)",
+    "name": "POC / Instrumente Structurale 2014–2020 (FEDR)",
     "banners": [],
     "text": "Proiect cofinanțat din Fondul European de Dezvoltare Regională prin Programul Operațional Competitivitate 2014-2020",
     "requires": [
@@ -31,7 +138,33 @@
       "projectTitle",
       "beneficiary"
     ],
-    "placement": "footer"
+    "placement": "header",
+    "order": [
+      "eu",
+      "guvern",
+      "program",
+      "instrumente-structurale"
+    ],
+    "rules": "MIV Instrumente Structurale 2014–2020 (ian. 2018): mandatory set EU emblem (with the words 'Uniunea Europeană' under it), Guvernul României, [PO logo if it exists], Instrumente Structurale 2014-2020 — in this order, left to right, in the header of the first page; EU emblem at least as large as the biggest other logo; free space between logos at least the emblem size. A separate official POC logo file was not found on mfe.gov.ro — ask the beneficiary for it.",
+    "sources": [
+      {
+        "url": "https://fonduri-ue.gov.ro/images/files/transparenta/comunicare/2018/Sigle.zip",
+        "file": "is-2014-2020-sigle.zip",
+        "note": "EU emblem + Instrumente Structurale 2014-2020 + Guvern — AI/EPS/PDF only, rasterised automatically; the mfe.gov.ro mirror of this ZIP is corrupt",
+        "insecure": true,
+        "page": "https://fonduri-ue.gov.ro/comunicare/comunicare"
+      },
+      {
+        "url": "https://mfe.gov.ro/wp-content/uploads/2019/01/be2ee097dc64a79229d5aa432287a599.pdf",
+        "file": "miv-is-2014-2020.pdf",
+        "note": "Manual de Identitate Vizuală Instrumente Structurale 2014–2020 (rev. ian. 2018)"
+      }
+    ],
+    "pick": [
+      "**/logo UE.png",
+      "**/sigla_guv_coroana_albastru.png",
+      "**/logo IS-2014-2020.png"
+    ]
   },
   "other": {
     "name": "Other programme (EU, national, private grant)",
@@ -41,6 +174,21 @@
       "projectTitle",
       "fundingText"
     ],
-    "placement": "footer"
+    "placement": "footer",
+    "sources": [
+      {
+        "url": "https://ec.europa.eu/regional_policy/sources/information-sources/logo-download-center/co-funded_en.zip",
+        "file": "eu-co-funded_en.zip",
+        "note": "EU emblem + 'Co-funded by the European Union' (EN) — other languages: replace _en with the ISO code"
+      },
+      {
+        "url": "https://commission.europa.eu/document/download/3192a0ef-6bda-4e1a-81ca-65ade2ffad73_en?filename=eu-emblem-rules_en.pdf",
+        "file": "eu-emblem-rules_en.pdf",
+        "note": "The use of the EU emblem in the context of EU programmes 2021–2027 (rules)"
+      }
+    ],
+    "pick": [
+      "**/co-funded_EN/horizontal/RGB/PNG/*Co-fundedbytheEU_RGB_POS.png"
+    ]
   }
 }

@@ -63,13 +63,13 @@ img { max-width: 100%; }
 .doc > h2:first-of-type { margin-top: 0; }
 /* funding / partner banners (EU, PNRR, grants) on the cover */
 .cover-banners { display: flex; flex-wrap: wrap; align-items: center; gap: 8mm; margin: 0 0 6mm; }
-.cover-banners img { max-height: 14mm; max-width: 50mm; height: auto; }
+.cover-banners img { max-height: 17mm; max-width: 64mm; height: auto; }
 .cover-banners p { flex-basis: 100%; margin: 0; font-size: 8.5pt; color: var(--muted); }
 /* funding bars repeated on every printed page (position: fixed repeats in Chrome print; keep them inside the page box) */
 .funding-bar { position: fixed; left: 0; right: 0; display: flex; align-items: center; gap: 6mm; padding: 1.5mm 0; background: var(--paper); font-size: 7.5pt; color: var(--muted); z-index: 10; }
 .funding-bar.top { top: 0; border-bottom: 1px solid var(--line); }
 .funding-bar.bottom { bottom: 0; border-top: 1px solid var(--line); }
-.funding-bar img { max-height: 8mm; max-width: 36mm; height: auto; }
+.funding-bar img { max-height: 9mm; max-width: 40mm; height: auto; }
 .funding-bar span { flex: 1; line-height: 1.2; text-align: right; }
 body.has-funding-header, body.has-funding-both { padding-top: 13mm; }
 body.has-funding-footer, body.has-funding-both { padding-bottom: 13mm; }

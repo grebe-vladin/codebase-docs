@@ -1,6 +1,6 @@
 {
   "name": "codebase-docs",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Document a module across several repos (e.g. Next.js frontend + NestJS backend) as handover-grade Markdown + PDF with branded diagrams and screenshots.",
   "author": { "name": "Vladin Grebenita", "url": "https://github.com/grebe-vladin" },
   "homepage": "https://github.com/grebe-vladin/codebase-docs",

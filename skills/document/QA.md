@@ -15,7 +15,7 @@ Read the document the way the reader will: as pages and as pictures. Findings ar
 - No placeholder, "TODO", "lorem", stray brackets, duplicated paragraph, or numbered list that restarts.
 - Code blocks do not overflow the page.
 - Page count within the depth target.
-- Funded project: banners, sentence and identifiers on the cover; the bar on every page at the chosen placement, not overlapping text; the sentence spelled exactly as the programme requires.
+- Funded project: banners, sentence and identifiers on the cover; the bar on every page at the chosen placement, not overlapping text; the sentence spelled exactly as the programme requires (never the acronym "UE"); logos in the programme's order (EU → Guvernul României → programme); the EU emblem at least as tall as every other logo in the bar and at least 1 cm high on paper (measure on the rasterised page: 1 cm ≈ 28 px at 72 dpi, 31 px at 80 dpi); free space between logos not smaller than the emblem.
 - A faint grey box around images in the `pdftoppm` renders (1 level off white) is a poppler colour-profile artefact, not a defect — real viewers show white. Anything darker than that is a defect.
 
 ## 2. Diagrams
