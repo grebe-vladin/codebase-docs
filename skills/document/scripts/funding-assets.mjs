@@ -8,6 +8,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const FUND = path.join(here, "..", "templates", "funding");
@@ -50,8 +51,10 @@ if (cmd === "list") {
   for (const src of p.sources) {
     const name = src.file || decodeURIComponent(path.basename(new URL(src.url).pathname)) || "download"; const dst = path.join(dir, name);
     if (fs.existsSync(dst) && !force) { console.log(`kept     ${name}`); }
-    else { try { execFileSync("curl", ["-L", "-sS", "--fail", "-A", "Mozilla/5.0 codebase-docs funding-assets", ...(src.insecure ? ["-k"] : []), "-o", dst, src.url], { stdio: ["ignore", "ignore", "pipe"], timeout: 600000 });
-        console.log(`fetched  ${name}  (${(fs.statSync(dst).size / 1024 / 1024).toFixed(1)} MB)${src.note ? ` — ${src.note}` : ""}`); }
+    else { if (src.insecure && !/^[0-9a-f]{64}$/i.test(src.sha256 || "")) { console.log(`SKIPPED  ${name}: source is marked insecure (TLS not verifiable) and has no pinned sha256 in programs.json — add one or fetch by hand`); continue; }
+      try { execFileSync("curl", ["-L", "-sS", "--fail", "-A", "Mozilla/5.0 codebase-docs funding-assets", ...(src.insecure ? ["-k"] : []), "-o", dst, src.url], { stdio: ["ignore", "ignore", "pipe"], timeout: 600000 });
+        if (src.sha256) { const got = createHash("sha256").update(fs.readFileSync(dst)).digest("hex"); if (got !== src.sha256.toLowerCase()) { fs.unlinkSync(dst); console.log(`REJECTED ${name}: sha256 ${got.slice(0, 12)}… does not match the pinned ${src.sha256.slice(0, 12)}… — the file changed or the download was tampered with; verify on ${src.page || src.url} and update programs.json`); continue; } }
+        console.log(`fetched  ${name}  (${(fs.statSync(dst).size / 1024 / 1024).toFixed(1)} MB${src.sha256 ? ", sha256 verified" : ""})${src.note ? ` — ${src.note}` : ""}`); }
       catch (e) { console.log(`FAILED   ${name}: ${(e.stderr || e.message).toString().split("\n")[0].slice(0, 120)} — source may have moved; check ${src.page || src.url}`); continue; } }
     if (/\.zip$/i.test(name)) { const x = path.join(dir, name.replace(/\.zip$/i, "")); if (!fs.existsSync(x) || force) { try { execFileSync("unzip", ["-o", "-q", dst, "-d", x], { stdio: "ignore" }); console.log(`         unzipped → downloads/${path.basename(x)}/`); } catch { console.log("         (unzip failed or not available — extract by hand)"); } }
       // nested zips (the 2014-2020 pack carries the Government sigla inside)

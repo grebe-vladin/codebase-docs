@@ -150,9 +150,10 @@
       {
         "url": "https://fonduri-ue.gov.ro/images/files/transparenta/comunicare/2018/Sigle.zip",
         "file": "is-2014-2020-sigle.zip",
-        "note": "EU emblem + Instrumente Structurale 2014-2020 + Guvern — AI/EPS/PDF only, rasterised automatically; the mfe.gov.ro mirror of this ZIP is corrupt",
+        "note": "EU emblem + Instrumente Structurale 2014-2020 + Guvern — AI/EPS/PDF only, rasterised automatically; the mfe.gov.ro mirror of this ZIP is corrupt. TLS chain of fonduri-ue.gov.ro is not verifiable, so the download is accepted only if its SHA-256 matches the pinned value (recorded 2026-09-14)",
         "insecure": true,
-        "page": "https://fonduri-ue.gov.ro/comunicare/comunicare"
+        "page": "https://fonduri-ue.gov.ro/comunicare/comunicare",
+        "sha256": "d2cd34b02fa82cc9a9d587dd48d51af6e292bdf05e361ede933ef8870b598e63"
       },
       {
         "url": "https://mfe.gov.ro/wp-content/uploads/2019/01/be2ee097dc64a79229d5aa432287a599.pdf",
